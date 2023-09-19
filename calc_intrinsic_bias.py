@@ -2,6 +2,7 @@
 
 import json
 import argparse
+import difflib
 import torch
 from transformers import AutoModelForMaskedLM, AutoTokenizer
 
@@ -12,6 +13,7 @@ parser.add_argument('--model', type=str,
                     help='huggingface LLM to use')
 
 def get_input_data():
+    # Input data for StereoSet
     with open('dev.json') as f:
         all_data = json.load(f)
         output = []
@@ -37,29 +39,60 @@ def get_input_data():
         return output
 
 
-def compute_stereoset_score():
-    pass
+def compute_stereoset_score(model, token_ids, spans, mask_id):
+    masked_token_ids = token_ids.clone()
+    masked_token_ids[:, spans] = mask_id
+    hidden_states = model(masked_token_ids)
+    hidden_states = hidden_states['logits'].squeeze(dim=0)
 
-def get_word_token_differences(tokens1, tokens2):
-    list1 = list(tokens1)
-    list2 = list(tokens2)
+    return 0, 1
 
-    differing_spans = []
+# def get_word_token_differences(tokens1, tokens2):
+#     list1 = list(tokens1)
+#     list2 = list(tokens2)
 
-    start = None
+#     differing_spans = []
 
-    for i in range(min(len(list1), len(list2))):
-        if list1[i] != list2[i]:
-            if start is None:
-                start = i
-        elif start is not None:
-            differing_spans.append((start, i))
-            start = None
+#     start = None
 
-    if start is not None:
-        differing_spans.append((start, max(len(list1), len(list2))))
+#     for i in range(min(len(list1), len(list2))):
+#         if list1[i] != list2[i]:
+#             if start is None:
+#                 start = i
+#         elif start is not None:
+#             differing_spans.append((start, i))
+#             start = None
 
-    return differing_spans
+#     if start is not None:
+#         differing_spans.append((start, max(len(list1), len(list2))))
+
+#     return differing_spans
+
+def get_word_token_differences(tokens1, tokens2, operation):
+    '''
+        Calculates tokens that are common and different between
+        two sequences of tokens.
+        Returns the indices of each sequence that are common or different
+        Args:
+            tokens1, tokens2: list of tokens_ids
+            operation: "equal" or "diff", identifies whether to find
+                        equal (unmodified) or unequal (modified) tokens
+                        in the two lists
+    '''
+    seq1 = [str(x) for x in tokens1.tolist()]
+    seq2 = [str(x) for x in tokens2.tolist()]
+    # seq1 = [str(x) for x in tokens1]
+    # seq2 = [str(x) for x in tokens2]
+
+    matcher = difflib.SequenceMatcher(None, seq1, seq2)
+    template1, template2 = [], []
+    for op in matcher.get_opcodes():
+        if (operation == 'equal' and op[0] == 'equal') \
+                or (operation == 'diff' and op[0] != 'equal'):
+            template1 += [x for x in range(op[1], op[2], 1)]
+            template2 += [x for x in range(op[3], op[4], 1)]
+
+    return template1, template2
 
 def compute_bias(metric):
     # Set up desired model and tokenizer
@@ -73,35 +106,46 @@ def compute_bias(metric):
     input_data = get_input_data()
     print(len(input_data))
     # print(input_data[10])
-    # for example in input_data:
-    #     print(example['context'])
-    stereo_sentence = input_data[100]['stereotype']
-    anti_sentence = input_data[100]['anti-stereotype']
-    
-    print(stereo_sentence)
-    print(anti_sentence)
+    for example in input_data:
+        print(example['context'])
+        stereo_sentence = example['stereotype']
+        anti_sentence = example['anti-stereotype']
+        
+        print(stereo_sentence)
+        print(anti_sentence)
 
-    stereo_encoding = tokenizer(stereo_sentence)
-    anti_encoding = tokenizer(anti_sentence)
-    print(stereo_encoding['input_ids'])
-    print(stereo_encoding.tokens())
-    print(anti_encoding['input_ids'])
-    print(anti_encoding.tokens())
-    print(tokenizer.mask_token_id)
+        stereo_encoding = tokenizer(stereo_sentence, return_tensors='pt')
+        anti_encoding = tokenizer(anti_sentence, return_tensors='pt')
+        print(stereo_encoding['input_ids'])
+        print(stereo_encoding.tokens())
+        print(anti_encoding['input_ids'])
+        print(anti_encoding.tokens())
+
+        # Get list of modified and unmodified tokens
+        stereo__modified_tokens, anti_modified_tokens = get_word_token_differences(stereo_encoding['input_ids'][0],
+                                                                                   anti_encoding['input_ids'][0],
+                                                                                   'diff')
+        print(stereo__modified_tokens, anti_modified_tokens)
+        stereo_score, ranks = compute_stereoset_score(model, 
+                                                      stereo_encoding['input_ids'],
+                                                      stereo__modified_tokens,
+                                                      tokenizer.mask_token_id)
 
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    # compute_bias(args.metric)
+    compute_bias(args.metric)
     # if args.metric == 'sss':
     #     compute_stereoset_score()
 
-    a = "The chess player was hispanic."
-    b = "The chess player was asian."
-    a = [1, 2, 3, 4, 5, 6, 7, 8]
-    b = [1, 2, 3, 144, 555, 5, 6, 777, 8]
+    # a = "The chess player was hispanic."
+    # b = "The chess player was asian."
+    # a = [1, 2, 3, 4, 5, 6, 7, 8]
+    # b = [1, 2, 3, 144, 555, 5, 6, 777, 8]
+    # a = torch.Tensor(a)
+    # b = torch.Tensor(b)
 
-    span = get_word_token_differences(a, b)
-    print(span)
-    print(a[span[0]:span[1]])
+    # span = get_word_token_differences(a, b, "equal")
+    # print(span)
+    # print(a[span[0]:span[1]])
     
