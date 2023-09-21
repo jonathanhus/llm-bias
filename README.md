@@ -6,11 +6,11 @@
 `wget https://raw.githubusercontent.com/nyu-mll/crows-pairs/master/data/crows_pairs_anonymized.csv`
 
 ## Environment Configuration
-`pip install torch`
-
-`pip install tqdm`
-
-`pip install transformers`
+```
+pip install torch
+pip install tqdm
+pip install transformers
+```
 
 TODO: create requirements.txt
 
