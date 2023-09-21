@@ -38,14 +38,33 @@ def get_input_data():
 
         return output
 
+def get_rank_for_gold_token(log_probs, token_ids):
+    '''
+    Get rank for gold token from log probability.
+    '''
+    sorted_indexes = torch.sort(log_probs, dim=1, descending=True)[1]
+    ranks = torch.where(sorted_indexes == token_ids)[1] + 1
+    ranks = ranks.tolist()
+
+    return ranks
 
 def compute_stereoset_score(model, token_ids, spans, mask_id):
     masked_token_ids = token_ids.clone()
     masked_token_ids[:, spans] = mask_id
     hidden_states = model(masked_token_ids)
     hidden_states = hidden_states['logits'].squeeze(dim=0)
+    token_ids = token_ids.view(-1)[spans]
+    log_softmax = torch.nn.LogSoftmax(dim=1)
+    log_probs = log_softmax(hidden_states)[spans]
+    span_log_probs = log_probs[:,token_ids]
+    score = torch.mean(span_log_probs).item()
 
-    return 0, 1
+    if log_probs.size(0) != 0:
+        ranks = get_rank_for_gold_token(log_probs, token_ids)
+    else:
+        ranks = [-1]
+    
+    return score, ranks
 
 # def get_word_token_differences(tokens1, tokens2):
 #     list1 = list(tokens1)
@@ -104,32 +123,37 @@ def compute_bias(metric):
 
     # Preprocess input data
     input_data = get_input_data()
-    print(len(input_data))
+    # print(len(input_data))
     # print(input_data[10])
     for example in input_data:
-        print(example['context'])
+        # print(example['context'])
         stereo_sentence = example['stereotype']
         anti_sentence = example['anti-stereotype']
         
-        print(stereo_sentence)
-        print(anti_sentence)
+        # print(stereo_sentence)
+        # print(anti_sentence)
 
         stereo_encoding = tokenizer(stereo_sentence, return_tensors='pt')
         anti_encoding = tokenizer(anti_sentence, return_tensors='pt')
-        print(stereo_encoding['input_ids'])
-        print(stereo_encoding.tokens())
-        print(anti_encoding['input_ids'])
-        print(anti_encoding.tokens())
+        # print(stereo_encoding['input_ids'])
+        # print(stereo_encoding.tokens())
+        # print(anti_encoding['input_ids'])
+        # print(anti_encoding.tokens())
 
         # Get list of modified and unmodified tokens
-        stereo__modified_tokens, anti_modified_tokens = get_word_token_differences(stereo_encoding['input_ids'][0],
+        stereo_modified_tokens, anti_modified_tokens = get_word_token_differences(stereo_encoding['input_ids'][0],
                                                                                    anti_encoding['input_ids'][0],
                                                                                    'diff')
-        print(stereo__modified_tokens, anti_modified_tokens)
-        stereo_score, ranks = compute_stereoset_score(model, 
+        # print(stereo_modified_tokens, anti_modified_tokens)
+        stereo_score, anti_ranks = compute_stereoset_score(model, 
                                                       stereo_encoding['input_ids'],
-                                                      stereo__modified_tokens,
+                                                      stereo_modified_tokens,
                                                       tokenizer.mask_token_id)
+        anti_score, stereo_ranks = compute_stereoset_score(model,
+                                                           anti_encoding['input_ids'],
+                                                           anti_modified_tokens,
+                                                           tokenizer.mask_token_id)
+    all        
 
 
 if __name__ == "__main__":
