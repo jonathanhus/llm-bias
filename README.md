@@ -1,9 +1,13 @@
 # Intrinsic and Extrinsic Bias Evaluation
 
 ## Get Data
-`wget https://raw.githubusercontent.com/moinnadeem/StereoSet/master/data/dev.json`
-
-`wget https://raw.githubusercontent.com/nyu-mll/crows-pairs/master/data/crows_pairs_anonymized.csv`
+```
+mkdir data
+wget -O data/cp.csv https://raw.githubusercontent.com/nyu-mll/crows-pairs/master/data/crows_pairs_anonymized.csv
+wget -O data/ss.json https://raw.githubusercontent.com/moinnadeem/StereoSet/master/data/dev.json
+python -u preprocess.py --input crows_pairs --output data/paralled_cp.json
+python -u preprocess.py --input stereoset --output data/paralled_ss.json
+```
 
 ## Environment Configuration
 ```
