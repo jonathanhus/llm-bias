@@ -56,7 +56,7 @@ tokenized_datasets = biosbias_dataset.map(tokenize_function, batched=False)
 
 # data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
-training_args = TrainingArguments('test-trainer')
+training_args = TrainingArguments('/scratch/jhus/test-trainer')
 
 trainer = Trainer(
     model,
