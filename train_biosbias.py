@@ -119,14 +119,25 @@ def eval_model():
 
         logits = outputs.logits
         predictions = torch.argmax(logits, dim=-1)
-        preds.append(predictions)
-    return preds
+        preds.extend(predictions.tolist())
+    return preds, tokenized_datasets['test']['label'], tokenized_datasets['test']['gender']
         # metric.add_batch(predictions=predictions, references=batch["labels"])
 
+def calc_extrinsic_bias(prediction, true_label, gender):
+    df = pd.DataFrame(list(zip(prediction, true_label, gender)),
+                      columns=['Predictions', 'Labels', 'Gender'])
+    for title in range(28):
+        for gender in ['M', 'F']:
+            j = len(df[(df['Labels']==title) & (df['Gender']==gender)])
+            print(f"Title: {title}   Gender: {gender}   Num: {j}")
+    
 if __name__ == "__main__":
     args = parser.parse_args()
     if args.task == 'train':
         train_model()
     elif args.task == 'eval':
-        preds = eval_model()
-        print(preds)
+        preds, true_labels, gender = eval_model()
+        # print(preds)
+        # print(true_labels)
+        # print(gender)
+        calc_extrinsic_bias(preds, true_labels, gender)
