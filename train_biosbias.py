@@ -129,11 +129,20 @@ def eval_model():
 def calc_extrinsic_bias(prediction, true_label, gender):
     df = pd.DataFrame(list(zip(prediction, true_label, gender)),
                       columns=['Predictions', 'Labels', 'Gender'])
+    
+    # Calculate bias by occupation
     for title in range(28):
         for gender in ['M', 'F']:
             total_num = len(df[(df['Labels']==title) & (df['Gender']==gender)])
             num_correct = len(df[(df['Labels']==title) & (df['Gender']==gender) & (df['Predictions']==df['Labels'])])
             print(f"Title: {id2label[title]}   Gender: {gender}   Total: {total_num}   Correct: {num_correct}   Percent: {num_correct/total_num}")
+
+    # Calculate bias across all occupations
+    print("Scores across all occupations")
+    for gender in ['M', 'F']:
+        total_num = len(df[df['Gender']==gender])
+        num_correct = len(df[(df['Gender']==gender) & (df['Predictions']==df['Labels'])])
+        print(f"Gender: {gender} Total: {total_num}  Correct: {num_correct}  Percent: {num_correct/total_num}")
     
 if __name__ == "__main__":
     args = parser.parse_args()
