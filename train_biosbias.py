@@ -130,8 +130,9 @@ def calc_extrinsic_bias(prediction, true_label, gender):
                       columns=['Predictions', 'Labels', 'Gender'])
     for title in range(28):
         for gender in ['M', 'F']:
-            j = len(df[(df['Labels']==title) & (df['Gender']==gender)])
-            print(f"Title: {title}   Gender: {gender}   Num: {j}")
+            total_num = len(df[(df['Labels']==title) & (df['Gender']==gender)])
+            num_correct = len(df[(df['Labels']==title) & (df['Gender']==gender) & (df['Predictions']==df['Labels'])])
+            print(f"Title: {title}   Gender: {gender}   Total: {total_num}   Correct: {num_correct}   Percent: {num_correct/total_num}")
     
 if __name__ == "__main__":
     args = parser.parse_args()
