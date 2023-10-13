@@ -1,10 +1,9 @@
-import pickle
 import pandas as pd
 import argparse
 import torch
-from torch.utils.data import random_split, DataLoader
-from datasets import load_dataset, Dataset
-from transformers import AutoModelForSequenceClassification, AutoTokenizer, DataCollatorWithPadding, AutoConfig
+from torch.utils.data import DataLoader
+from datasets import Dataset
+from transformers import AutoModelForSequenceClassification, AutoTokenizer, DataCollatorWithPadding
 from transformers import TrainingArguments, Trainer
 from collections import defaultdict
 
@@ -68,15 +67,10 @@ biosbias_dataset = biosbias_dataset.map(truncate_bio)
 # print(data_sample[:3])
 
 # Define model and tokenizer
-# config = AutoConfig.from_pretrained(model_checkpoint, num_labels=28, label2id=label2id, id2label=id2label)
 model = AutoModelForSequenceClassification.from_pretrained(model_checkpoint, num_labels=28, id2label=id2label, label2id=label2id)
-# model = AutoModelForSequenceClassification.from_pretrained(model_checkpoint, config=config)
 tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
 
 # Tokenize the sample text
-# def tokenize_function(example):
-#     start_pos = example["start_pos"]
-#     return tokenizer(example["raw"][start_pos:])
 def tokenize_function(example):
     return tokenizer(example["reduced_bio"])
 
