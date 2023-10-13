@@ -107,6 +107,7 @@ def train_model():
 def eval_model():
     preds = []
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    print(f"Device: {device}")
     model.to(device)
     model.eval()
 
