@@ -16,37 +16,32 @@ parser.add_argument('--model', type=str,
 
 args = parser.parse_args()
 
+# Specify model from huggingface or local checkpoint to use
 # model_checkpoint = 'bert-base-uncased'
-model_checkpoint = 'checkpoint-12000'
+# model_checkpoint = 'checkpoint-12000'
 model_checkpoint = args.model
-
 
 
 # Read pickle that was created using script from biosbias repo
 # and create Dataset
 x = pd.read_pickle(r'BIOS.pkl')
-# df = pd.DataFrame(x)
 data_files = Dataset.from_pandas(pd.DataFrame(data=x))
 
 # Get all job titles and counts of each in the training set
 title_count = defaultdict(int)
 for record in data_files:
     title_count[record["title"]] += 1
-# print(title_count)
-# print(f"Num of titles: {len(title_count.keys())}")
 
 # Create label mappings
+# id: integer representing occupation (title)
+# label: text representing occupation (title)
 id2label = dict()
 for idx, title in enumerate(sorted(title_count.keys())):
     id2label[idx] = title
-# id2label = sorted(title_count.keys())
-# print(id2label)
 
 label2id = dict()
 for idx, title in id2label.items():
     label2id[title] = idx
-# print(label2id)
-
 
 
 # Split dataset into train, dev, and test
@@ -55,35 +50,39 @@ dev_test_split = biosbias_dataset['test'].train_test_split(train_size=0.5, seed=
 biosbias_dataset['dev'] = dev_test_split['train']
 biosbias_dataset['test'] = dev_test_split['test']
 
-# biosbias_dataset = biosbias_dataset.rename_column(original_column_name='title',
-#                                                   new_column_name='label')
-
-# Function to add label ID to the training set
+# Add label ID (i.e., the integer) to the training set
 def add_label_id(example):
     return {"label": label2id[example['title']]}
 
 biosbias_dataset = biosbias_dataset.map(add_label_id)
+
+# Create reduced bio
+def truncate_bio(example):
+    start_pos = example["start_pos"]
+    return {"reduced_bio": example["raw"][start_pos:]}
+
+biosbias_dataset = biosbias_dataset.map(truncate_bio)
 
 # Show 3 random samples from dataset
 # data_sample = biosbias_dataset["train"].shuffle(seed=42).select(range(1000))
 # print(data_sample[:3])
 
 # Define model and tokenizer
-config = AutoConfig.from_pretrained(model_checkpoint, num_labels=28, label2id=label2id, id2label=id2label)
-# model = AutoModelForSequenceClassification.from_pretrained(model_checkpoint, num_labels=28, id2label=id2label, label2id=label2id)
-model = AutoModelForSequenceClassification.from_pretrained(model_checkpoint, config=config)
-
+# config = AutoConfig.from_pretrained(model_checkpoint, num_labels=28, label2id=label2id, id2label=id2label)
+model = AutoModelForSequenceClassification.from_pretrained(model_checkpoint, num_labels=28, id2label=id2label, label2id=label2id)
+# model = AutoModelForSequenceClassification.from_pretrained(model_checkpoint, config=config)
 tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
-print("Here")
 
 # Tokenize the sample text
+# def tokenize_function(example):
+#     start_pos = example["start_pos"]
+#     return tokenizer(example["raw"][start_pos:])
 def tokenize_function(example):
-    start_pos = example["start_pos"]
-    return tokenizer(example["raw"][start_pos:])
+    return tokenizer(example["reduced_bio"])
 
-tokenized_datasets = biosbias_dataset.map(tokenize_function, batched=False)
-# print(tokenized_datasets)
+tokenized_datasets = biosbias_dataset.map(tokenize_function, batched=True)
 
+# Define a data collator to do batch padding
 data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
 def train_model():
@@ -101,8 +100,6 @@ def train_model():
 
     trainer.train()
 
-    # Once training is complete, do eval
-
 
 def eval_model():
     preds = []
@@ -113,7 +110,7 @@ def eval_model():
 
     clean_tokenized_dataset = tokenized_datasets['test']
     clean_tokenized_dataset = clean_tokenized_dataset.remove_columns(["path", "raw", "name", "raw_title", "gender", 
-                                                                      "start_pos", "title", "URI", "bio"])
+                                                                      "start_pos", "title", "URI", "bio", "reduced_bio"])
     eval_dataloader = DataLoader(clean_tokenized_dataset, batch_size=8, collate_fn=data_collator)
     for batch in eval_dataloader:
         batch = {k: v.to(device) for k, v in batch.items()}
@@ -152,7 +149,4 @@ if __name__ == "__main__":
         train_model()
     elif args.task == 'eval':
         preds, true_labels, gender = eval_model()
-        # print(preds)
-        # print(true_labels)
-        # print(gender)
         calc_extrinsic_bias(preds, true_labels, gender)
