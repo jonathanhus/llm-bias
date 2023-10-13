@@ -134,6 +134,7 @@ def calc_extrinsic_bias(prediction, true_label, gender):
 if __name__ == "__main__":
     args = parser.parse_args()
     model_checkpoint = args.model
+    print(model_checkpoint)
     if args.task == 'train':
         train_model()
     elif args.task == 'eval':
