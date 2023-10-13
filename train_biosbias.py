@@ -14,9 +14,11 @@ parser.add_argument('--task', type=str, choices=['train', 'eval'],
 parser.add_argument('--model', type=str,
                     help='huggingface LLM or saved checkpoint to use')
 
+args = parser.parse_args()
 
 # model_checkpoint = 'bert-base-uncased'
 model_checkpoint = 'checkpoint-12000'
+model_checkpoint = args.model
 
 
 
