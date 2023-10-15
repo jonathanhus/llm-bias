@@ -25,6 +25,7 @@ If using the original evalutate code:
 `python evaluate.py --data [cp, ss] --output /Your/output/path --model [bert, roberta, albert] --method [aula, aul, cps, sss]`
 
 If using the modified version, which doesn't require preprocessing
+
 `TODO`
 
 ## Extrinsic Bias
@@ -38,6 +39,7 @@ https://github.com/microsoft/biosbias
 For convenience, the BIOS.pkl that was generated is included in this repo
 
 To evaluate the fine-tuned model on the BiosBias test dataset:
+
 `python train_biosbias.py --task eval --model /scratch/jhus/test-trainer/checkpoint-12000/`
 
 #### STS-Bias
