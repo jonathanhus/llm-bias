@@ -43,7 +43,7 @@ To evaluate the fine-tuned model on the BiosBias test dataset:
 `python train_biosbias.py --task eval --model /scratch/jhus/test-trainer/checkpoint-12000/`
 
 #### STS-Bias
-The STS-Bios dataset is not publicly available. As the authors did, we attempted to recreate the dataset following the procedure briefly described in 
+The STS-Bias dataset is not publicly available. As the authors did, we attempted to recreate the dataset following the procedure briefly described in 
 "Measuring and Reducing Gendered Correlations in Pre-trained Models" by Kellie Webster, et al. https://arxiv.org/pdf/2010.06032.pdf
 
 We downloaded the STS-B data from here: http://ixa2.si.ehu.es/stswiki/images/4/48/Stsbenchmark.tar.gz
