@@ -30,20 +30,26 @@ If using the modified version, which doesn't require preprocessing
 
 ## Extrinsic Bias
 
-### Datasets
-
-#### BiosBias
+### BiosBias
 The biosbias dataset was generated following the instructions located here:
 https://github.com/microsoft/biosbias
 
 For convenience, the BIOS.pkl that was generated is included in this repo
 
-To evaluate the fine-tuned model on the BiosBias test dataset:
+To finetune the model on the BiosBias dataset:
+
+`python train_biosbias.py --task train --model bert-base-uncased`
+
+To evaluate the finetuned model on the BiosBias test dataset, specifying a model checkpoint from the previous finetuning step:
 
 `python train_biosbias.py --task eval --model /scratch/jhus/test-trainer/checkpoint-12000/`
 
-#### STS-Bias
+### STS-Bias
 The STS-Bias dataset is not publicly available. As the authors did, we attempted to recreate the dataset following the procedure briefly described in 
 "Measuring and Reducing Gendered Correlations in Pre-trained Models" by Kellie Webster, et al. https://arxiv.org/pdf/2010.06032.pdf
 
 We downloaded the STS-B data from here: http://ixa2.si.ehu.es/stswiki/images/4/48/Stsbenchmark.tar.gz
+
+To generate the STS-bias dataset:
+
+`python create_stsbias_dataset.py`
