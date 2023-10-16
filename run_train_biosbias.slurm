@@ -42,4 +42,5 @@ export PYTHONPATH=$REPO_PATH
 LOG_DIR="/scratch/jhus/train.log"
 
 ## BiosBias Finetuning
-python train_biosbias.py > $LOG_DIR
+python train_biosbias.py --task train --model bert-base-uncased > $LOG_DIR
+
