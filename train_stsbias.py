@@ -1,6 +1,7 @@
 from datasets import load_dataset
 from transformers import AutoTokenizer, DataCollatorWithPadding
 from transformers import TrainingArguments, AutoModelForSequenceClassification, Trainer
+import torch
 import argparse
 
 # train model on STS-B dataset
@@ -45,6 +46,14 @@ def eval_model(model):
     sts_bias_dataset = load_dataset("json", data_files="stsbias.json")
     print(sts_bias_dataset)
 
+    tokenizer = AutoTokenizer.from_pretrained(model)
+    model = AutoModelForSequenceClassification.from_pretrained(model)
+    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    model.to(device)
+    model.eval()
+
+
+
 
 if __name__ == "__main__":
     args = parser.parse_args()
@@ -53,5 +62,5 @@ if __name__ == "__main__":
     if args.task == 'train':
         train_model(args.model, args.model_dir)
     elif args.task == 'eval':
-        preds, true_labels, gender = eval_model()
+        preds, true_labels, gender = eval_model(args.model)
         
