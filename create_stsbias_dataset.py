@@ -1,8 +1,10 @@
 import pandas as pd
 import re
+import json
 
-# x = pd.read_csv('stsbenchmark/sts-test.csv', sep='\t')
-# df = pd.DataFrame(x)
+'''
+Create the STS-Bias dataset
+'''
 
 with open('stsbenchmark/sts-test.csv') as f:
     lines = f.readlines()
@@ -80,21 +82,14 @@ for template in clean_templates:
         else:
             print("ERROR")
         example = dict()
-        example["sentence1"] = male_sentence
-        example["sentence2"] = occupation_sentence
-        example["sentence3"] = female_sentence
-        example["sentence4"] = occupation_sentence
+        example["male_sentence"] = male_sentence
+        example["female_sentence"] = female_sentence
+        example["occupation_sentence"] = occupation_sentence
         examples.append(example)
 
-print(len(clean_templates))
-print(len(examples))
 
-
-
-# from datasets import load_dataset
-
-# data = load_dataset('glue', 'mnli')
-
-# print(data)
-
-# print(data['train'][11])
+# Write dataset to file in jsonl format
+with open('stsbias.json', 'w') as outfile:
+    for example in examples:
+        json.dump(example, outfile)
+        outfile.write('\n')
