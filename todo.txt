@@ -1,0 +1,7 @@
+To Do Items:
+- Generate debiased versions of BERT, ALBERT, RoBERTa following scripts here:
+    https://github.com/Irenehere/Auto-Debias/tree/main
+- Generate NLI-Bias dataset following procedure in Debiasing Isn't Enough
+- Run debiased versions of BERT, ALBERT, RoBERTa on intrinsic bias scripts in our repo
+- Run debiased versions of BERT, ALBERT, RoBERTa on extrinsic bias scripts
+- Develop to train and evalutate NLI-Bias
