@@ -4,4 +4,4 @@ To Do Items:
 - Generate NLI-Bias dataset following procedure in Debiasing Isn't Enough
 - Run debiased versions of BERT, ALBERT, RoBERTa on intrinsic bias scripts in our repo
 - Run debiased versions of BERT, ALBERT, RoBERTa on extrinsic bias scripts
-- Develop to train and evalutate NLI-Bias
+- Develop code to train and evalutate NLI-Bias
