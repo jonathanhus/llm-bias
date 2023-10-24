@@ -53,3 +53,13 @@ We downloaded the STS-B data from here: http://ixa2.si.ehu.es/stswiki/images/4/4
 To generate the STS-bias dataset:
 
 `python create_stsbias_dataset.py`
+
+### NLI-Bias
+The NLI-Bias dataset was generated using scripts and files located here:
+https://github.com/sunipa/On-Measuring-and-Mitigating-Biased-Inferences-of-Word-Embeddings.git
+
+Using that repo, generate NLI-Bias
+TODO: Verify this output is correct
+`python generate_templates.py --noun --p occupations --h gendered_words --output nli-bias.csv`
+
+For convenience the generated dataset is included in this repo as `insert filename`
