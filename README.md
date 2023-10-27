@@ -61,7 +61,9 @@ The NLI-Bias dataset was generated using scripts and files located here:
 https://github.com/sunipa/On-Measuring-and-Mitigating-Biased-Inferences-of-Word-Embeddings.git
 
 Using that repo, generate NLI-Bias
-TODO: Verify this output is correct
-`python generate_templates.py --noun --p occupations --h gendered_words --output nli-bias.csv`
 
-For convenience the generated dataset is included in this repo as `insert filename`
+TODO: Verify this output is correct
+
+`python generate_templates.py --noun --p occupations --h gendered_words --output nli_bias.csv`
+
+For convenience the generated dataset is included in this repo as `nli_bias.csv`
