@@ -48,6 +48,8 @@ To evaluate the finetuned model on the BiosBias test dataset, specifying a model
 The STS-Bias dataset is not publicly available. As the authors did, we attempted to recreate the dataset following the procedure briefly described in 
 "Measuring and Reducing Gendered Correlations in Pre-trained Models" by Kellie Webster, et al. https://arxiv.org/pdf/2010.06032.pdf
 
+BLS occupation statistics can be found here: https://github.com/rudinger/winogender-schemas/blob/master/data/occupations-stats.tsv
+
 We downloaded the STS-B data from here: http://ixa2.si.ehu.es/stswiki/images/4/48/Stsbenchmark.tar.gz
 
 To generate the STS-bias dataset:

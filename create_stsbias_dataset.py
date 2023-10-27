@@ -85,6 +85,7 @@ for template in clean_templates:
         example["male_sentence"] = male_sentence
         example["female_sentence"] = female_sentence
         example["occupation_sentence"] = occupation_sentence
+        example["occupation"] = occupation
         examples.append(example)
 
 

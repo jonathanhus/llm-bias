@@ -2,6 +2,8 @@ from datasets import load_dataset
 from transformers import AutoTokenizer, DataCollatorWithPadding
 from transformers import TrainingArguments, AutoModelForSequenceClassification, Trainer
 import torch
+from torch.utils.data import DataLoader
+import pandas as pd
 import argparse
 
 # train model on STS-B dataset
@@ -43,16 +45,57 @@ def train_model(model, model_dir):
     
 
 def eval_model(model):
-    sts_bias_dataset = load_dataset("json", data_files="stsbias.json")
-    print(sts_bias_dataset)
-
     tokenizer = AutoTokenizer.from_pretrained(model)
     model = AutoModelForSequenceClassification.from_pretrained(model)
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     model.to(device)
     model.eval()
 
+    # Load sts-bias dataset
+    sts_bias_dataset = load_dataset("json", data_files="stsbias.json")
+    print(sts_bias_dataset)
 
+    def tokenize_male_function(example):
+        return tokenizer(example["male_sentence"], example["occupation_sentence"])
+    
+    def tokenize_female_function(example):
+        return tokenizer(example["female_sentence"], example["occupation_sentence"])
+
+    # 
+    male_tokenized_dataset = sts_bias_dataset.map(tokenize_male_function, batched=True)
+    male_tokenized_dataset = male_tokenized_dataset.remove_columns(["male_sentence", "female_sentence", "occupation_sentence", "occupation"])
+    female_tokenized_dataset = sts_bias_dataset.map(tokenize_female_function, batched=True)
+    female_tokenized_dataset = female_tokenized_dataset.remove_columns(["male_sentence", "female_sentence", "occupation_sentence", "occupation"])
+
+    # Define a data collator to do batch padding
+    data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+
+    # First evaluate similarity scores of male and occupation
+    eval_dataloader = DataLoader(male_tokenized_dataset["train"], batch_size=8, collate_fn=data_collator)
+    male_preds = []
+    for batch in eval_dataloader:
+        batch = {k: v.to(device) for k, v in batch.items()}
+        with torch.no_grad():
+            outputs = model(**batch)
+
+        logits = outputs.logits.squeeze()
+        male_preds.extend(logits.tolist())
+
+    # Second evaluate similarity scores of female and occupation
+    eval_dataloader = DataLoader(female_tokenized_dataset["train"], batch_size=8, collate_fn=data_collator)
+    female_preds = []
+    for batch in eval_dataloader:
+        batch = {k: v.to(device) for k, v in batch.items()}
+        with torch.no_grad():
+            outputs = model(**batch)
+
+        logits = outputs.logits.squeeze()
+        female_preds.extend(logits.tolist())
+
+    # Save results (which will be analyzed using Excel)
+    results = pd.DataFrame(list(zip(male_preds, female_preds, sts_bias_dataset['train']['occupation'])),
+                           columns=["Male Score", "Female Score", "Occupation"])
+    results.to_csv('stsbias_results.csv', index=False)
 
 
 if __name__ == "__main__":
@@ -62,5 +105,5 @@ if __name__ == "__main__":
     if args.task == 'train':
         train_model(args.model, args.model_dir)
     elif args.task == 'eval':
-        preds, true_labels, gender = eval_model(args.model)
+        eval_model(args.model)
         
