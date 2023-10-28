@@ -66,4 +66,9 @@ TODO: Verify this output is correct
 
 `python generate_templates.py --noun --p occupations --h gendered_words --output nli_bias.csv`
 
-For convenience the generated dataset is included in this repo as `nli_bias.csv`
+The generated output file is over 400MB in size. To reduce the size by removing unnecessary columns
+and limiting the number of rows, run the following script:
+
+`python create_nli_dataset.py`
+
+For convenience the generated dataset is included in this repo as `reduced_nli_bias.csv`

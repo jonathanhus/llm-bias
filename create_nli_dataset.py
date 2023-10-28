@@ -16,4 +16,4 @@ print(df.columns)
 
 # Removes everything after the sheriff occupation
 df = df.iloc[:1641312]
-df.to_csv('reduced_nli.csv', index=False)
+df.to_csv('reduced_nli_bias.csv', index=False)
