@@ -53,7 +53,7 @@ def eval_model(model):
     model.eval()
 
     # Load nli-bias dataset
-    nli_bias_dataset = load_dataset("csv", data_files="nli_bias.csv")
+    nli_bias_dataset = load_dataset("csv", data_files="/scratch/jhus/nli_bias.csv")
     print(nli_bias_dataset)
 
     def tokenize_function(example):
