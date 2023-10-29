@@ -68,16 +68,22 @@ def eval_model(model):
     # Define a data collator to do batch padding
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
-    # First evaluate similarity scores of male and occupation
+    # Evaluate
     eval_dataloader = DataLoader(tokenized_dataset["train"], batch_size=8, collate_fn=data_collator)
-    male_preds = []
+    preds = []
     for batch in eval_dataloader:
         batch = {k: v.to(device) for k, v in batch.items()}
         with torch.no_grad():
             outputs = model(**batch)
 
-        logits = outputs.logits.squeeze()
-        male_preds.extend(logits.tolist())
+        logits = outputs.logits
+        predictions = torch.argmax(logits, dim=-1)
+        preds.extend(predictions.tolist())
+
+    # Save results (which will be analyzed using Excel)
+    results = pd.DataFrame(list(zip(preds, nli_bias_dataset['train']['hypothesis_filler_word'])),
+                           columns=["Prediction", "GenderWord"])
+    results.to_csv('nlibias_results.csv', index=False)
 
 
 
