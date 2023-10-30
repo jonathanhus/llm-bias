@@ -42,4 +42,4 @@ export PYTHONPATH=$REPO_PATH
 LOG_DIR="/scratch/jhus/eval-sts.log"
 
 ## NLIBias Finetuning
-python train_nlibias.py --task eval --model /scratch/jhus/test-trainer-sts/checkpoint-2000/  > $LOG_DIR
+python train_stsbias.py --task eval --model /scratch/jhus/test-trainer-sts/checkpoint-2000/  > $LOG_DIR
