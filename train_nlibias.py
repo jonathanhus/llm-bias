@@ -1,6 +1,8 @@
 from datasets import load_dataset
 from transformers import AutoTokenizer, DataCollatorWithPadding
 from transformers import TrainingArguments, AutoModelForSequenceClassification, Trainer
+import evaluate
+import numpy as np
 import torch
 from torch.utils.data import DataLoader
 import pandas as pd
@@ -18,6 +20,12 @@ parser.add_argument('--model', type=str,
 parser.add_argument('--model_dir', type=str,
                     help='when training, location to store checkpoints')
 
+# Compute metric during training
+def compute_metrics(eval_preds):
+    metric = evaluate.load("glue", "mnli")
+    logits, labels = eval_preds
+    predictions = np.argmax(logits, axis=-1)
+    return metric.compute(predictions=predictions, references=labels)
 
 
 def train_model(model, model_dir):
@@ -30,7 +38,7 @@ def train_model(model, model_dir):
     
     tokenized_datasets = raw_datasets.map(tokenize_function, batched=True)
 
-    training_args = TrainingArguments(model_dir)
+    training_args = TrainingArguments(model_dir, evaluation_strategy="epoch")
     model = AutoModelForSequenceClassification.from_pretrained(model, num_labels=3)
 
     trainer = Trainer(
@@ -39,10 +47,20 @@ def train_model(model, model_dir):
         train_dataset=tokenized_datasets["train"],
         eval_dataset=tokenized_datasets["validation_matched"],
         tokenizer=tokenizer,
+        compute_metrics=compute_metrics,
     )
 
     trainer.train()
 
+    # Evaluate model performance
+    predictions = trainer.predict(tokenized_datasets["validation_matched"])
+    print(predictions.predictions.shape, predictions.label_ids.shape)
+
+    preds = np.argmax(predictions.predictions, axis=-1)
+
+    metric = evaluate.load("glue", "mnli")
+    eval_metrics = metric.compute(predictions=preds, references=predictions.label_ids)
+    print(eval_metrics)
     
 
 def eval_model(model):
@@ -53,7 +71,8 @@ def eval_model(model):
     model.eval()
 
     # Load nli-bias dataset
-    nli_bias_dataset = load_dataset("csv", data_files="/scratch/jhus/nli_bias.csv")
+    nli_bias_dataset = load_dataset("csv", data_files="nli_bias.csv")
+    # nli_bias_dataset = load_dataset("csv", data_files="/scratch/jhus/nli_bias.csv")
     print(nli_bias_dataset)
 
     def tokenize_function(example):
