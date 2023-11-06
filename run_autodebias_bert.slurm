@@ -4,7 +4,7 @@
 ##  Anything in <angle brackets> needs to be modified by you (remove <> too)
 
 ## Specify a name for Slurm to use when displaying your job.
-#SBATCH --job-name=nlibias
+#SBATCH --job-name=debias
 
 ## Select a partition (queue) to submit your job to.
 ##SBATCH --partition=normal
