@@ -32,7 +32,7 @@ module load cudnn
 
 ## Run your program or script
 source ~/cs782/fuzzy-goofballs/.venv-cs782/bin/activate
-cd /home/jhus/cs782/fuzzy-goofballs/Auto-Debias
+cd /home/jhus/cs782/Auto-Debias
 
 set -x;
 set -e;
