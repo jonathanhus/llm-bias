@@ -4,7 +4,7 @@
 ##  Anything in <angle brackets> needs to be modified by you (remove <> too)
 
 ## Specify a name for Slurm to use when displaying your job.
-#SBATCH --job-name=bert-debias
+#SBATCH --job-name=albert-debias
 
 ## Select a partition (queue) to submit your job to.
 ##SBATCH --partition=normal
@@ -42,4 +42,4 @@ export PYTHONPATH=$REPO_PATH
 LOG_DIR="/scratch/jhus/debias.log"
 
 ## Auto-Debias
-python auto-debias.py --debias_type gender --model_type bert --model_name_or_path bert-base-uncased --prompts_file prompts_bert-base-uncased_gender > $LOG_DIR
+python auto-debias.py --debias_type gender --model_type albert --model_name_or_path albert-base-v2 --prompts_file prompts_bert-base-uncased_gender > $LOG_DIR
