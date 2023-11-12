@@ -39,8 +39,10 @@ set -e;
 REPO_PATH="/home/jhus/cs782/"
 export PYTHONPATH=$REPO_PATH
 
-LOG_DIR="/scratch/jhus/train.log"
+LOG_DIR="/scratch/jhus/bios-train.log"
 
 ## BiosBias Finetuning
-python train_biosbias.py --task train --model bert-base-uncased > $LOG_DIR
+# python train_biosbias.py --task train --model bert-base-uncased --dir /scratch/jhus/test-trainer-bios-bert > $LOG_DIR
+python train_biosbias.py --task train --model albert-base-v2 --dir /scratch/jhus/test-trainer-bios-albert > $LOG_DIR
+# python train_biosbias.py --task train --model roberta-base --dir /scratch/jhus/test-trainer-bios-roberta > $LOG_DIR
 
