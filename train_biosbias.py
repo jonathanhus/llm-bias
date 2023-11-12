@@ -12,7 +12,7 @@ parser.add_argument('--task', type=str, choices=['train', 'eval'],
                     help='train or eval model')
 parser.add_argument('--model', type=str,
                     help='huggingface LLM or saved checkpoint to use')
-parser.add_argument('--dir', type=str,
+parser.add_argument('--model_dir', type=str,
                     help='directory to save training checkpoints')
 
 args = parser.parse_args()
@@ -84,7 +84,7 @@ data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 def train_model():
     # TODO: add argument for this parameter
     # training_args = TrainingArguments('/scratch/jhus/test-trainer')
-    training_args = TrainingArguments(args.dir)
+    training_args = TrainingArguments(args.model_dir)
 
     trainer = Trainer(
         model,
