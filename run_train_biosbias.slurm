@@ -10,9 +10,9 @@
 ##SBATCH --partition=normal
 #SBATCH --partition=gpuq
 #SBATCH --qos=gpu
-#SBATCH --gres=gpu:3g.40gb:1
+#SBATCH --gres=gpu:3g.40gb:2
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
+#SBATCH --ntasks-per-node=8
 
 ## Deal with output and errors.  Separate into 2 files (not the default).
 ## May help to put your result files in a directory: e.g. /scratch/%u/logs/...
