@@ -10,7 +10,7 @@
 ##SBATCH --partition=normal
 #SBATCH --partition=gpuq
 #SBATCH --qos=gpu
-#SBATCH --gres=gpu:1g.10gb:1
+#SBATCH --gres=gpu:2g.20gb:1
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 
