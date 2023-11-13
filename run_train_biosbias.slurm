@@ -10,9 +10,9 @@
 ##SBATCH --partition=normal
 #SBATCH --partition=gpuq
 #SBATCH --qos=gpu
-#SBATCH --gres=gpu:A100.80gb:1
+#SBATCH --gres=gpu:1g.10gb:1
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=8
+#SBATCH --ntasks-per-node=1
 
 ## Deal with output and errors.  Separate into 2 files (not the default).
 ## May help to put your result files in a directory: e.g. /scratch/%u/logs/...
@@ -43,6 +43,6 @@ LOG_DIR="/scratch/jhus/bios-train.log"
 
 ## BiosBias Finetuning
 # python train_biosbias.py --task train --model bert-base-uncased --model_dir /scratch/jhus/test-trainer-bios-bert > $LOG_DIR
-python train_biosbias.py --task train --model albert-base-v2 --model_dir /scratch/jhus/test-trainer-bios-albert > $LOG_DIR
-# python train_biosbias.py --task train --model roberta-base --model_dir /scratch/jhus/test-trainer-bios-roberta > $LOG_DIR
+# python train_biosbias.py --task train --model albert-base-v2 --model_dir /scratch/jhus/test-trainer-bios-albert > $LOG_DIR
+python train_biosbias.py --task train --model roberta-base --model_dir /scratch/jhus/test-trainer-bios-roberta > $LOG_DIR
 
