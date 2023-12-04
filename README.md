@@ -66,7 +66,7 @@ To finetune the model on the STS-Bias dataset
 
 To evaluate the finetuned model on the STS-Bias test dataset, specifying a model checkpoint from the previous finetuning step:
 
-python train_stsbias.py --task eval --model /scratch/jhus/test-trainer-sts/checkpoint-2000/
+`python train_stsbias.py --task eval --model /scratch/jhus/test-trainer-sts/checkpoint-2000/`
 
 ### NLI-Bias
 The NLI-Bias dataset was generated using scripts and files located here:
@@ -94,7 +94,13 @@ Debiased models are obtained using code from the following repo:
 
 https://github.com/Irenehere/Auto-Debias.git
 
-The debiased models can then be finetuned and evaluated on the BiosBias, STS_Bias, and NLI-Bias datasets using the commands and scripts mentioned above, substituting the appropriate model in the command parameters.
+`python auto-debias.py --debias_type gender --model_type bert --model_name_or_path bert-base-uncased --prompts_file prompts_bert-base-uncased_gender`
+
+`python auto-debias.py --debias_type gender --model_type albert --model_name_or_path albert-base-v2 --prompts_file prompts_bert-base-uncased_gender`
+
+`python auto-debias.py --debias_type gender --model_type roberta --model_name_or_path roberta-base --prompts_file prompts_bert-base-uncased_gender`
+
+The debiased models can then be finetuned and evaluated on the BiosBias, STS-Bias, and NLI-Bias datasets using the commands and scripts mentioned above, substituting the appropriate model in the command parameters.
 
 ## SLURM Scripts
 A number of sample SLURM scripts are included in this repo for instances when the models are to be trained and evaluated on cluster environments.
