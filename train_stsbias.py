@@ -6,7 +6,9 @@ from torch.utils.data import DataLoader
 import pandas as pd
 import argparse
 
-# train model on STS-B dataset
+'''
+    Script to finetune a model and then evaluate it for bias using STS-Bias data   
+'''
 
 
 parser = argparse.ArgumentParser()
@@ -20,6 +22,10 @@ parser.add_argument('--model_dir', type=str,
 
 
 def train_model(model, model_dir):
+    '''
+        Train the model to be evaluated for bias. The model is trained
+        on the STS-B dataset, which is included in the GLUE Benchmark
+    '''
     raw_datasets = load_dataset('glue', 'stsb')
 
     tokenizer = AutoTokenizer.from_pretrained(model)
@@ -45,6 +51,11 @@ def train_model(model, model_dir):
     
 
 def eval_model(model):
+    '''
+        Evaluate model on STS-Bias dataset
+        stsbias.json must have been created previously
+        using the script create_stsbias_dataset.py)
+    '''
     tokenizer = AutoTokenizer.from_pretrained(model)
     model = AutoModelForSequenceClassification.from_pretrained(model)
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
@@ -61,7 +72,7 @@ def eval_model(model):
     def tokenize_female_function(example):
         return tokenizer(example["female_sentence"], example["occupation_sentence"])
 
-    # 
+    # Create male and female datasets
     male_tokenized_dataset = sts_bias_dataset.map(tokenize_male_function, batched=True)
     male_tokenized_dataset = male_tokenized_dataset.remove_columns(["male_sentence", "female_sentence", "occupation_sentence", "occupation"])
     female_tokenized_dataset = sts_bias_dataset.map(tokenize_female_function, batched=True)
