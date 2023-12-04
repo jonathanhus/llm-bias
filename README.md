@@ -13,7 +13,7 @@ The calculation of intrinsic bias is based largely on the work of Masahiro Kanek
 
 ### Get Data
 
-The following commands download and preprocess the CrowS=Pairs and Stereoset data. If desired, these steps can be skipped since the preprocessed output is included in the repo.
+The following commands download and preprocess the CrowS-Pairs and StereoSet data. If desired, these steps can be skipped since the preprocessed output is included in the repo.
 ```
 mkdir data
 wget -O data/cp.csv https://raw.githubusercontent.com/nyu-mll/crows-pairs/master/data/crows_pairs_anonymized.csv
